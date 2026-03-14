@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChessMaster</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>♞</text></svg>">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="home" class="screen active">
+        <div class="container glass-panel">
+            <div class="title-container">
+                <h1 class="game-title"><span class="logo">♞</span> ChessMaster</h1>
+                <p class="tagline">Where Brilliance Meets Strategy</p>
+            </div>
+            <div class="menu-grid">
+                <button class="mode-btn gradient-btn" onclick="showAIScreen()">Play vs AI</button>
+                <button class="mode-btn gradient-btn" onclick="showLocalScreen()">Local Multiplayer</button>
+                <button class="mode-btn gradient-btn" onclick="showOnlineScreen()">Online Multiplayer</button>
+                <button class="mode-btn dark-btn" onclick="showRules()">Rules</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ai" class="screen hidden">
+        <div class="container glass-panel">
+            <div class="title-container">
+                <h2>Choose AI Difficulty</h2>
+            </div>
+            <div class="difficulty-grid">
+                <button class="difficulty-btn gradient-btn" onclick="startAIGame('easy')">Easy</button>
+                <button class="difficulty-btn gradient-btn" onclick="startAIGame('medium')">Medium</button>
+                <button class="difficulty-btn gradient-btn" onclick="startAIGame('hard')">Hard</button>
+            </div>
+            <div class="back-btn-container">
+                <button class="back-btn" onclick="showHomeScreen()">← Back</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="local" class="screen hidden">
+        <div class="container glass-panel">
+            <div class="title-container">
+                <h2>Local Two Player Game</h2>
+            </div>
+            <div class="start-section">
+                <button class="start-btn gradient-btn" onclick="startLocalGame()">Start Game</button>
+            </div>
+            <div class="back-btn-container">
+                <button class="back-btn" onclick="showHomeScreen()">← Back</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="online" class="screen hidden">
+        <div class="container glass-panel">
+            <div class="title-container">
+                <h2>Online Multiplayer</h2>
+            </div>
+            <div class="online-options">
+                <button class="online-btn gradient-btn" onclick="createRoom()">Create Room</button>
+                <button class="online-btn dark-btn" onclick="showJoinRoom()">Join Room</button>
+            </div>
+            
+            <div id="joinRoomSection" class="join-section hidden">
+                <input type="text" id="roomCode" placeholder="Enter 6-character code" maxlength="6" class="room-input">
+                <button class="start-btn gradient-btn" onclick="joinRoom()">Join Game</button>
+            </div>
+            
+            <div class="back-btn-container">
+                <button class="back-btn" onclick="showHomeScreen()">← Back</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameScreen" class="screen hidden">
+        <div class="game-container">
+            <div class="game-header glass-panel">
+                <div class="game-info">
+                    <div class="info-item">
+                        <span id="currentPlayerText" class="info-value text-highlight">White's Turn</span>
+                    </div>
+                    <div class="info-item">
+                        <span id="gameStatus" class="info-value"></span>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button id="undoBtn" class="control-btn hidden icon-btn" onclick="undoMove()" title="Undo">↩️</button>
+                    <button id="redoBtn" class="control-btn hidden icon-btn" onclick="redoMove()" title="Redo">↪️</button>
+                    <button class="control-btn icon-btn" onclick="confirmRestart()" title="Restart">🔄</button>
+                    <button class="control-btn dark-btn icon-btn" onclick="confirmExit()" title="Exit to Menu">🏠</button>
+                </div>
+            </div>
+            
+            <div class="board-layout">
+                <div class="chessboard-wrapper">
+                    <div id="chessboard" class="chessboard shadow-lg"></div>
+                </div>
+                
+                <div class="side-panel glass-panel">
+                    <div class="panel-section history-section">
+                        <h3 style="font-size: 1rem; margin-bottom: 5px;">Move History</h3>
+                        <div id="moveHistory" class="move-history"></div>
+                    </div>
+                    
+                    <div id="aiControls" class="panel-section hidden">
+                        <p id="aiThinkingText" class="text-highlight" style="font-size: 0.9rem; margin-top: 5px;">AI is thinking...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="rulesModal" class="modal hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h2>Complete Chess Rules</h2>
+                <button class="close-btn" onclick="hideRules()">×</button>
+            </div>
+            <div class="modal-body rules-body">
+                <h3 class="text-highlight">The Setup</h3>
+                <p>Chess is played on an 8x8 board. White always moves first. Players alternate single turns.</p>
+                <br>
+                <h3 class="text-highlight">Piece Movement</h3>
+                <ul>
+                    <li><strong>King (♔):</strong> Moves exactly 1 square in any direction.</li>
+                    <li><strong>Queen (♕):</strong> Moves any number of vacant squares in any direction (diagonally, horizontally, or vertically).</li>
+                    <li><strong>Rook (♖):</strong> Moves any number of vacant squares horizontally or vertically.</li>
+                    <li><strong>Bishop (♗):</strong> Moves any number of vacant squares diagonally.</li>
+                    <li><strong>Knight (♘):</strong> Moves in an "L" shape (two squares in one direction, then one square at a 90-degree angle). Can jump over other pieces.</li>
+                    <li><strong>Pawn (♙):</strong> Moves forward exactly 1 square. On its first move, it can move forward 2 squares. Captures exactly 1 square diagonally forward.</li>
+                </ul>
+                <br>
+                <h3 class="text-highlight">Special Rules</h3>
+                <ul>
+                    <li><strong>Castling:</strong> A simultaneous move of the King and Rook. The King moves 2 squares toward the Rook, and the Rook jumps over the King. Allowed only if neither piece has moved, the path is clear, and the King is not in, moving through, or landing in Check.</li>
+                    <li><strong>En Passant:</strong> If a pawn moves 2 squares on its first move and lands beside an enemy pawn, that enemy pawn can capture it on the very next turn as if it had only moved 1 square.</li>
+                    <li><strong>Promotion:</strong> When a pawn reaches the opposite end of the board, it must be instantly swapped for a Queen, Rook, Bishop, or Knight of the same color.</li>
+                </ul>
+                <br>
+                <h3 class="text-highlight">Winning & Drawing</h3>
+                <ul>
+                    <li><strong>Check:</strong> The King is under immediate attack. You MUST move the King, block the attack, or capture the attacker.</li>
+                    <li><strong>Checkmate:</strong> The King is in Check and has no legal escape. The game is over.</li>
+                    <li><strong>Stalemate (Draw):</strong> The player whose turn it is is NOT in Check, but has absolutely no legal moves left. The game is a tie.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="promotionModal" class="modal hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3 style="margin:0;">Choose Promotion</h3>
+            </div>
+            <div class="promotion-pieces">
+                <button class="promotion-piece" data-piece="queen">♕</button>
+                <button class="promotion-piece" data-piece="rook">♖</button>
+                <button class="promotion-piece" data-piece="bishop">♗</button>
+                <button class="promotion-piece" data-piece="knight">♘</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal hidden">
+        <div class="modal-content glass-panel custom-alert">
+            <div class="modal-body alert-body">
+                <p id="confirmMessage" style="font-size: 1.2rem; font-weight: bold; color: white;">Are you sure?</p>
+                <div id="confirmActions" class="modal-actions">
+                    <button class="gradient-btn" onclick="executeConfirm()">Yes</button>
+                    <button id="cancelConfirmBtn" class="dark-btn" onclick="closeConfirm()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameOverModal" class="modal hidden">
+        <div class="modal-content glass-panel custom-alert">
+            <div class="modal-body alert-body">
+                <h2 id="gameOverMessage" class="text-highlight" style="font-size: 2rem; margin-bottom: 0;">Game Over</h2>
+                <div class="modal-actions">
+                    <button class="gradient-btn" onclick="closeGameOverAndRestart()">Play Again</button>
+                    <button class="dark-btn" onclick="closeGameOverAndExit()">Main Menu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="chess-engine.js"></script>
+    <script src="network.js"></script>
+    <script src="ui.js"></script>
+</body>
+</html>
