@@ -1,7 +1,7 @@
 class OnlineGame {
     constructor(uiController) {
         this.ui = uiController;
-        this.socket = io('http://localhost:3000'); 
+        this.socket = io('https://chessmaster-f3f3.onrender.com'); 
         this.roomCode = null;
         this.setupListeners();
     }
